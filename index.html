@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ContÁbaco - Protótipo</title>
+    <link rel="icon" href="logo aplicativo.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            max-width: 800px; /* Aumentado para tablet */
+            margin: 0 auto;
+            padding: 0;
+            padding-bottom: 60px;
+        }
+
+        header {
+            background-color: #002775;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            position: sticky;
+            top: 0;
+        }
+
+        header img {
+            width: 32px; /* Aumentado para tablet */
+            height: 32px; /* Aumentado para tablet */
+            margin-right: 12px; /* Ajustado para tablet */
+            cursor: pointer;
+        }
+
+        header h1 {
+            font-size: 22px; /* Aumentado para tablet */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: start;
+            min-height: calc(90vh - 60px);
+            padding: 25px; /* Aumentado para tablet */
+        }
+
+        #timer {
+            font-size: 80px; /* Aumentado para tablet */
+            color: #002775;
+            margin: 40px 0; /* Aumentado para tablet */
+        }
+
+        select {
+            width: 100%;
+            padding: 12px; /* Aumentado para tablet */
+            margin: 12px 0; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            border-radius: 5px;
+            border: 1px solid #000;
+            appearance: none;
+            background: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat right 10px center;
+            background-color: white;
+            background-size: 20px;
+        }
+
+        button {
+            background-color: #002775;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 12px 24px; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            cursor: pointer;
+            margin-top: 25px; /* Aumentado para tablet */
+            width: 250px; /* Aumentado para tablet */
+        }
+
+        button.active {
+            background-color: red;
+        }
+
+        .pause-btn {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px; /* Aumentado para tablet */
+            font-size: 14px; /* Aumentado para tablet */
+            cursor: pointer;
+            margin-bottom: -15px;
+            width: 120px; /* Aumentado para tablet */
+            align-self: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #002775;
+            width: 100%;
+            max-width: 800px; /* Aumentado para tablet */
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0; /* Aumentado para tablet */
+            z-index: 10;
+        }
+
+        .icon-container {
+            position: relative;
+            width: 50px; /* Aumentado para tablet */
+            height: 50px; /* Aumentado para tablet */
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .icon-container img {
+            width: 38px; /* Aumentado para tablet */
+            height: 38px; /* Aumentado para tablet */
+            position: relative;
+            transition: transform 0.3s ease;
+            z-index: 2;
+        }
+
+        .icon-container .circle {
+            position: absolute;
+            bottom: 5px;
+            width: 42px; /* Aumentado para tablet */
+            height: 42px; /* Aumentado para tablet */
+            border-radius: 50%;
+            background-color: #002775;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 1;
+        }
+
+        .icon-container.active img {
+            transform: translateY(-5px);
+        }
+
+        .icon-container.active .circle {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scan-screen {
+            display: none;
+            text-align: center;
+            padding: 25px; /* Aumentado para tablet */
+            width: 100%;
+        }
+
+        .scan-screen h2 {
+            color: #002775;
+            margin-bottom: 15px; /* Aumentado para tablet */
+            font-size: 24px; /* Aumentado para tablet */
+        }
+        
+        /* NOVO ÍCONE DE LÁPIS */
+        #editScanIcon {
+            cursor: pointer;
+            margin-left: 12px; /* Aumentado para tablet */
+            font-size: 22px; /* Aumentado para tablet */
+            transition: color 0.3s;
+        }
+        #editScanIcon:hover {
+            color: #FFA500;
+        }
+
+        .demo-note {
+            color: #666;
+            font-size: 14px; /* Aumentado para tablet */
+            margin-bottom: 18px; /* Aumentado para tablet */
+            font-style: italic;
+            line-height: 1.3;
+        }
+
+        .abacus-container {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 18px; /* Aumentado para tablet */
+            margin: 18px 0; /* Aumentado para tablet */
+            min-height: 180px; /* Aumentado para tablet */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .abacus-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0; /* Aumentado para tablet */
+            font-size: 16px; /* Aumentado para tablet */
+            width: 100%;
+        }
+
+        .abacus-title {
+            font-weight: bold;
+            color: #002775;
+        }
+
+        .abacus-value {
+            font-weight: bold;
+        }
+
+        .generate-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 14px 24px; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            cursor: pointer;
+            margin: 12px 0; /* Aumentado para tablet */
+            width: 85%; /* Aumentado para tablet */
+            max-width: 300px; /* Aumentado para tablet */
+        }
+
+        .report-btn {
+            background-color: #002775;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 14px 24px; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            cursor: pointer;
+            margin: 12px 0; /* Aumentado para tablet */
+            width: 100%;
+        }
+
+        #results {
+            width: 100%;
+            margin-top: 15px; /* Aumentado para tablet */
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 25px; /* Aumentado para tablet */
+            border-radius: 10px;
+            width: 85%; /* Aumentado para tablet */
+            max-width: 400px; /* Aumentado para tablet */
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px; /* Aumentado para tablet */
+        }
+
+        .modal-btn {
+            padding: 10px 18px; /* Aumentado para tablet */
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px; /* Aumentado para tablet */
+        }
+
+        .confirm-btn {
+            background-color: #002775;
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #ccc;
+            color: black;
+        }
+        
+        /* NOVOS ESTILOS PARA MODAL DE EDIÇÃO */
+        .edit-scan-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px; /* Aumentado para tablet */
+        }
+        .edit-scan-item label {
+            font-size: 16px; /* Aumentado para tablet */
+            color: #333;
+            text-align: left;
+        }
+        .edit-scan-input {
+            width: 80px; /* Aumentado para tablet */
+            padding: 6px; /* Aumentado para tablet */
+            font-size: 16px; /* Aumentado para tablet */
+            text-align: right;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        /* Remove spinners do input de número */
+        .edit-scan-input::-webkit-outer-spin-button,
+        .edit-scan-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .edit-scan-input[type=number] {
+            -moz-appearance: textfield; /* Para o Firefox */
+            appearance: textfield;      /* O padrão (para outros navegadores) */
+        }
+
+        /* NOVOS ESTILOS PARA O MODAL DE ESCANEAMENTO OBRIGATÓRIO */
+        .scan-required-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .scan-required-content {
+            background-color: white;
+            padding: 30px; /* Aumentado para tablet */
+            border-radius: 10px;
+            width: 85%;
+            max-width: 450px; /* Aumentado para tablet */
+            text-align: center;
+            position: relative;
+        }
+
+        .scan-required-text {
+            margin-bottom: 25px; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            line-height: 1.4;
+        }
+
+        .understand-btn {
+            background-color: #002775;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            cursor: pointer;
+            margin-top: 18px; /* Aumentado para tablet */
+        }
+
+        /* Estilos para o modal de resumo do turno */
+        .summary-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .summary-content {
+            background-color: white;
+            padding: 25px; /* Aumentado para tablet */
+            border-radius: 10px;
+            width: 85%;
+            max-width: 450px; /* Aumentado para tablet */
+        }
+
+        .summary-title {
+            color: #002775;
+            text-align: center;
+            margin-bottom: 18px; /* Aumentado para tablet */
+            font-size: 22px; /* Aumentado para tablet */
+        }
+
+        .summary-item {
+            margin-bottom: 12px; /* Aumentado para tablet */
+            font-size: 16px; /* Aumentado para tablet */
+        }
+
+        .summary-label {
+            font-weight: bold;
+            color: #002775;
+        }
+
+        .summary-value {
+            margin-left: 5px;
+        }
+
+        .summary-btn {
+            background-color: #002775;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            cursor: pointer;
+            margin-top: 25px; /* Aumentado para tablet */
+            width: 100%;
+        }
+
+        /* Estilos para a tela de relatórios */
+        .report-screen {
+            display: none;
+            padding: 25px; /* Aumentado para tablet */
+            width: 100%;
+        }
+
+        .report-screen h2 {
+            color: #002775;
+            margin-bottom: 18px; /* Aumentado para tablet */
+            text-align: center;
+            font-size: 24px; /* Aumentado para tablet */
+        }
+
+        .report-item {
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 18px; /* Aumentado para tablet */
+            margin-bottom: 12px; /* Aumentado para tablet */
+            cursor: pointer;
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px; /* Aumentado para tablet */
+            font-weight: bold;
+            color: #002775;
+            font-size: 16px; /* Aumentado para tablet */
+        }
+
+        .report-date {
+            font-size: 14px; /* Aumentado para tablet */
+            color: #666;
+        }
+
+        .report-funcionarios {
+            font-size: 16px; /* Aumentado para tablet */
+            margin-top: 8px; /* Aumentado para tablet */
+        }
+
+        .no-reports {
+            text-align: center;
+            color: #666;
+            margin-top: 40px; /* Aumentado para tablet */
+            font-style: italic;
+            font-size: 16px; /* Aumentado para tablet */
+        }
+
+        /* Estilos para o modal de detalhes do relatório */
+        .report-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .report-detail-content {
+            background-color: white;
+            padding: 25px; /* Aumentado para tablet */
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px; /* Aumentado para tablet */
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .report-detail-title {
+            color: #002775;
+            text-align: center;
+            margin-bottom: 18px; /* Aumentado para tablet */
+            font-size: 22px; /* Aumentado para tablet */
+        }
+
+        .report-detail-info {
+            margin-bottom: 18px; /* Aumentado para tablet */
+        }
+
+        .report-detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0; /* Aumentado para tablet */
+            font-size: 16px; /* Aumentado para tablet */
+        }
+
+        .report-detail-total {
+            font-weight: bold;
+            margin-top: 12px; /* Aumentado para tablet */
+            padding-top: 12px; /* Aumentado para tablet */
+            border-top: 1px solid #ddd;
+            font-size: 16px; /* Aumentado para tablet */
+        }
+
+        .chart-container {
+            width: 100%;
+            margin: 25px 0; /* Aumentado para tablet */
+        }
+
+        .close-report-btn {
+            background-color: #002775;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px 24px; /* Aumentado para tablet */
+            font-size: 18px; /* Aumentado para tablet */
+            cursor: pointer;
+            margin-top: 18px; /* Aumentado para tablet */
+            width: 100%;
+        }
+
+        /* Estilos para o upload de imagem */
+        .file-input-container {
+            width: 100%;
+            margin: 12px 0; /* Aumentado para tablet */
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 12px; /* Aumentado para tablet */
+            border: 2px dashed #002775;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            color: #002775;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            font-size: 16px; /* Aumentado para tablet */
+            
+            /* NOVOS ESTILOS PARA O PREVIEW */
+            min-height: 80px; /* Aumentado para tablet */
+            background-size: cover;
+            background-position: center;
+            transition: border-style 0.3s, background-image 0.3s;
+        }
+
+        .file-input-label:hover {
+            background-color: #f0f0f0;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .loading-message {
+            display: none;
+            color: #002775;
+            margin: 12px 0; /* Aumentado para tablet */
+            font-style: italic;
+            font-size: 16px; /* Aumentado para tablet */
+        }
+
+        /* Media Query para telas maiores (tablets grandes e desktops) */
+        @media (min-width: 1024px) {
+            body {
+                max-width: 900px; /* Aumentado ainda mais para tablets maiores */
+            }
+            
+            .container {
+                padding: 30px; /* Aumentado ainda mais para tablets maiores */
+            }
+            
+            /* Melhorar layout dos resultados para telas maiores */
+            #results {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .abacus-item {
+                margin: 10px 0; /* Aumentado ainda mais para tablets maiores */
+            }
+            
+            footer {
+                max-width: 900px; /* Aumentado ainda mais para tablets maiores */
+            }
+        }
+
+        /* Media Query para telas menores (celulares) */
+        @media (max-width: 480px) {
+            body {
+                max-width: 100%; /* Permitir que ocupe toda a largura */
+            }
+            
+            .container {
+                padding: 15px; /* Reduzir padding para celular */
+            }
+            
+            #timer {
+                font-size: 60px; /* Reduzir para celular */
+            }
+            
+            button {
+                width: 200px; /* Reduzir para celular */
+                font-size: 16px; /* Reduzir para celular */
+            }
+            
+            footer {
+                max-width: 100%; /* Permitir que ocupe toda a largura */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- O restante do HTML permanece igual -->
+    <header>
+        <img src="logo aplicativo.png" alt="" />
+        <h1>ContÁbaco</h1>
+    </header>
+
+    <div class="container" id="mainScreen">
+        <div id="timer">00:00</div>
+
+        <select id="funcionario1">
+            <option selected disabled>Selecione os funcionários responsáveis</option>
+            <option>Alex Caetano</option>
+            <option>Bruno Pereira</option>
+            <option>Carlos Santi</option>
+            <option>Danieli Francine</option>
+            <option>Domingos Alexandre</option>
+            <option>Flavio Martins</option>
+            <option>Hobert Valdir</option>
+            <option>Lisete Mathias</option>
+            <option>Marcelo Grilo</option>
+            <option>Marcelo Modolo</option>
+            <option>Maria Antonia</option>
+            <option>Myrna Yoshie</option>
+            <option>Nisflei Carvalho</option>
+            <option>Paola Maluceli</option>
+            <option>Raíssa Marconato</option>
+            <option>Ricardo Ivonei</option>
+            <option>Viviane Virgínia</option>
+        </select>
+
+        <select id="funcionario2">
+            <option selected disabled>Selecione os funcionários responsáveis</option>
+            <option>Alex Caetano</option>
+            <option>Bruno Pereira</option>
+            <option>Carlos Santi</option>
+            <option>Danieli Francine</option>
+            <option>Domingos Alexandre</option>
+            <option>Flavio Martins</option>
+            <option>Hobert Valdir</option>
+            <option>Lisete Mathias</option>
+            <option>Marcelo Grilo</option>
+            <option>Marcelo Modolo</option>
+            <option>Maria Antonia</option>
+            <option>Myrna Yoshie</option>
+            <option>Nisflei Carvalho</option>
+            <option>Paola Maluceli</option>
+            <option>Raíssa Marconato</option>
+            <option>Ricardo Ivonei</option>
+            <option>Viviane Virgínia</option>
+        </select>
+
+        <div id="pauseBtnContainer" style="display: none;">
+            <button class="pause-btn" id="pauseBtn">Pausar Turno</button>
+        </div>
+        <button id="startStopBtn">Iniciar Turno</button>
+    </div>
+
+    <div class="container scan-screen" id="scanScreen">
+        <h2>
+            ESCANEIE O ÁBACO 
+            <i class="fa-solid fa-pencil" id="editScanIcon" title="Editar manualmente"></i>
+        </h2>
+        
+        <p class="demo-note">* Faça o upload de uma imagem do ábaco para análise automática ou clique no lápis para inserir os dados manualmente.</p>
+
+        <div class="abacus-container">
+            <div class="file-input-container">
+                <label for="imageInput" class="file-input-label">
+                    📷 Clique para selecionar uma imagem do ábaco
+                </label>
+                <input type="file" id="imageInput" class="file-input" accept="image/*" />
+                <div id="fileName" style="margin-top: 5px; font-size: 12px; color: #666;"></div>
+            </div>
+            <button class="generate-btn" id="analyzeBtn">Analisar Imagem</button>
+            <div id="loadingMessage" class="loading-message">
+                Analisando imagem... Aguarde.
+            </div>
+        </div>
+
+        <div id="results">
+            <div class="abacus-item">
+                <span class="abacus-title">Aerosaculite</span>
+                <span class="abacus-value" id="aerosaculite">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Celulite</span>
+                <span class="abacus-value" id="celulite">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Contusão</span>
+                <span class="abacus-value" id="contusao">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Hematomas</span>
+                <span class="abacus-value" id="hematomas">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Hepatite</span>
+                <span class="abacus-value" id="hepatite">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Micoplasmose</span>
+                <span class="abacus-value" id="micoplasmose">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Pericardite</span>
+                <span class="abacus-value" id="pericardite">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Peritonite</span>
+                <span class="abacus-value" id="peritonite">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Salmonelose</span>
+                <span class="abacus-value" id="salmonelose">0</span>
+            </div>
+            <div class="abacus-item">
+                <span class="abacus-title">Tuberculose</span>
+                <span class="abacus-value" id="tuberculose">0</span>
+            </div>
+        </div>
+
+        <button class="report-btn" id="reportBtn">Gerar Relatório</button>
+    </div>
+
+    <div class="container report-screen" id="reportScreen">
+        <h2>Relatórios</h2>
+        <div id="reportsList">
+            <p class="no-reports">Nenhum relatório gerado ainda</p>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <p>Deseja realmente finalizar o turno?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" id="confirmEnd">Sim</button>
+                <button class="modal-btn cancel-btn" id="cancelEnd">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="editScanModal">
+        <div class="modal-content" style="max-height: 80vh; overflow-y: auto; width: 90%; max-width: 400px;">
+            <h3 class="summary-title">Editar Contagem Manual</h3>
+            <div id="editScanForm">
+                <div class="edit-scan-item">
+                    <label for="edit_aerosaculite">Aerosaculite</label>
+                    <input type="number" id="edit_aerosaculite" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_celulite">Celulite</label>
+                    <input type="number" id="edit_celulite" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_contusao">Contusão</label>
+                    <input type="number" id="edit_contusao" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_hematomas">Hematomas</label>
+                    <input type="number" id="edit_hematomas" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_hepatite">Hepatite</label>
+                    <input type="number" id="edit_hepatite" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_micoplasmose">Micoplasmose</label>
+                    <input type="number" id="edit_micoplasmose" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_pericardite">Pericardite</label>
+                    <input type="number" id="edit_pericardite" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_peritonite">Peritonite</label>
+                    <input type="number" id="edit_peritonite" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_salmonelose">Salmonelose</label>
+                    <input type="number" id="edit_salmonelose" class="edit-scan-input" min="0" value="0">
+                </div>
+                <div class="edit-scan-item">
+                    <label for="edit_tuberculose">Tuberculose</label>
+                    <input type="number" id="edit_tuberculose" class="edit-scan-input" min="0" value="0">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn confirm-btn" id="saveEditScan">Salvar</button>
+                <button class="modal-btn cancel-btn" id="cancelEditScan">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="scan-required-modal" id="scanRequiredModal">
+        <div class="scan-required-content">
+            <div class="scan-required-text">
+                Antes de finalizar, você precisa escanear o ábaco para registrar os dados da produção.
+            </div>
+            <button class="understand-btn" id="understandBtn">Entendi</button>
+        </div>
+    </div>
+
+    <div class="summary-modal" id="summaryModal">
+        <div class="summary-content">
+            <h3 class="summary-title">Resumo do Turno</h3>
+            <div class="summary-item">
+                <span class="summary-label">Duração:</span>
+                <span class="summary-value" id="summaryDuration">00:00</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Funcionário 1:</span>
+                <span class="summary-value" id="summaryFunc1">Não selecionado</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Funcionário 2:</span>
+                <span class="summary-value" id="summaryFunc2">Não selecionado</span>
+            </div>
+            <button class="summary-btn" id="closeSummary">Fechar</button>
+        </div>
+    </div>
+
+    <div class="report-detail-modal" id="reportDetailModal">
+        <div class="report-detail-content">
+            <h3 class="report-detail-title" id="detailReportTitle">Relatório 1</h3>
+
+            <div class="report-detail-info">
+                <div class="report-detail-item">
+                    <span>Data:</span>
+                    <span id="detailReportDate"></span>
+                </div>
+                <div class="report-detail-item">
+                    <span>Duração:</span>
+                    <span id="detailReportDuration"></span>
+                </div>
+                <div class="report-detail-item">
+                    <span>Funcionário 1:</span>
+                    <span id="detailReportFunc1"></span>
+                </div>
+                <div class="report-detail-item">
+                    <span>Funcionário 2:</span>
+                    <span id="detailReportFunc2"></span>
+                </div>
+            </div>
+
+            <div id="detailReportItems"></div>
+
+            <div class="report-detail-total" id="detailReportTotal"></div>
+
+            <div class="chart-container">
+                <canvas id="reportChart"></canvas>
+            </div>
+
+            <button class="close-report-btn" id="closeReportBtn">Fechar</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="icon-container" id="scanIcon" data-icon-default="333certo.png" data-icon-active="333certo.png">
+            <img src="333certo.png" alt="Scanner" />
+            <div class="circle"></div>
+        </div>
+        <div class="icon-container active" id="homeIcon" data-icon-default="111certo.png"
+            data-icon-active="111.1certo.png">
+            <img src="111certo.png" alt="Home" />
+            <div class="circle"></div>
+        </div>
+        <div class="icon-container" id="reportIcon" data-icon-default="222certo.png" data-icon-active="222.1certo.png">
+            <img src="222certo.png" alt="Relatório" />
+            <div class="circle"></div>
+        </div>
+    </footer>
+
+    <script>
+        // O JavaScript permanece o mesmo, não houve necessidade de alteração
+        let timer;
+        let seconds = 0;
+        let isPaused = false;
+        let hasScanned = false;
+        let isShiftActive = false;
+        let reportCounter = 1;
+        let reports = [];
+        let reportChart = null;
+
+        const timerDisplay = document.getElementById("timer");
+        const button = document.getElementById("startStopBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const pauseBtnContainer = document.getElementById("pauseBtnContainer");
+        const mainScreen = document.getElementById("mainScreen");
+        const scanScreen = document.getElementById("scanScreen");
+        const reportScreen = document.getElementById("reportScreen");
+        const scanIcon = document.getElementById("scanIcon");
+        const homeIcon = document.getElementById("homeIcon");
+        const reportIcon = document.getElementById("reportIcon");
+        const imageInput = document.getElementById("imageInput");
+        const analyzeBtn = document.getElementById("analyzeBtn");
+        const loadingMessage = document.getElementById("loadingMessage");
+        const fileName = document.getElementById("fileName");
+        
+        // --- ALTERAÇÃO AQUI ---
+        // Adicionada a constante para o label do input
+        const fileInputLabel = document.querySelector(".file-input-label"); 
+        
+        const reportBtn = document.getElementById("reportBtn");
+        const confirmModal = document.getElementById("confirmModal");
+        const confirmEnd = document.getElementById("confirmEnd");
+        const cancelEnd = document.getElementById("cancelEnd");
+        const scanRequiredModal = document.getElementById("scanRequiredModal");
+        const understandBtn = document.getElementById("understandBtn");
+        const summaryModal = document.getElementById("summaryModal");
+        const closeSummary = document.getElementById("closeSummary");
+        const summaryDuration = document.getElementById("summaryDuration");
+        const summaryFunc1 = document.getElementById("summaryFunc1");
+        const summaryFunc2 = document.getElementById("summaryFunc2");
+        const funcionario1Select = document.getElementById("funcionario1");
+        const funcionario2Select = document.getElementById("funcionario2");
+        const reportsList = document.getElementById("reportsList");
+        const reportDetailModal = document.getElementById("reportDetailModal");
+        const detailReportTitle = document.getElementById("detailReportTitle");
+        const detailReportDate = document.getElementById("detailReportDate");
+        const detailReportDuration = document.getElementById("detailReportDuration");
+        const detailReportFunc1 = document.getElementById("detailReportFunc1");
+        const detailReportFunc2 = document.getElementById("detailReportFunc2");
+        const detailReportItems = document.getElementById("detailReportItems");
+        const detailReportTotal = document.getElementById("detailReportTotal");
+        const reportChartCanvas = document.getElementById("reportChart");
+        const closeReportBtn = document.getElementById("closeReportBtn");
+        
+        // NOVAS CONSTANTES PARA O MODAL DE EDIÇÃO
+        const editScanIcon = document.getElementById("editScanIcon");
+        const editScanModal = document.getElementById("editScanModal");
+        const saveEditScan = document.getElementById("saveEditScan");
+        const cancelEditScan = document.getElementById("cancelEditScan");
+
+        // Lista de condições (para facilitar a iteração)
+        const conditions = [
+            "aerosaculite", "celulite", "contusao", "hematomas",
+            "hepatite", "micoplasmose", "pericardite", "peritonite",
+            "salmonelose", "tuberculose"
+        ];
+        
+        // Inicializa todos os valores como 0
+        const initializeValues = () => {
+            conditions.forEach(condition => {
+                document.getElementById(condition).textContent = "0";
+            });
+        };
+
+        // Chama a função ao carregar a página
+        window.onload = initializeValues;
+
+        function updateTimerDisplay() {
+            const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+            const secs = String(seconds % 60).padStart(2, "0");
+            timerDisplay.textContent = `${mins}:${secs}`;
+        }
+
+        function startTimer() {
+            isShiftActive = true;
+            timer = setInterval(() => {
+                if (!isPaused) {
+                    seconds++;
+                    updateTimerDisplay();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timer);
+        }
+
+        function resetTimer() {
+            stopTimer();
+            seconds = 0;
+            updateTimerDisplay();
+            isShiftActive = false;
+            button.textContent = "Iniciar Turno";
+            button.classList.remove("active");
+            pauseBtnContainer.style.display = "none";
+            isPaused = false;
+            pauseBtn.textContent = "Pausar Turno";
+            pauseBtn.style.backgroundColor = "#FFA500";
+        }
+
+        function resetFuncionarios() {
+            funcionario1Select.selectedIndex = 0;
+            funcionario2Select.selectedIndex = 0;
+        }
+
+        function showSummary() {
+            // Atualiza os dados do resumo
+            summaryDuration.textContent = timerDisplay.textContent;
+
+            const func1 = funcionario1Select.value || "Não selecionado";
+            const func2 = funcionario2Select.value || "Não selecionado";
+
+            summaryFunc1.textContent = func1 === "Selecione os funcionários responsáveis" ? "Não selecionado" : func1;
+            summaryFunc2.textContent = func2 === "Selecione os funcionários responsáveis" ? "Não selecionado" : func2;
+
+            // Mostra o modal de resumo
+            summaryModal.style.display = "flex";
+        }
+
+        function createReport() {
+            // Coleta os dados do escaneamento
+            const reportData = {
+                id: reportCounter,
+                date: new Date().toLocaleString(),
+                duration: timerDisplay.textContent,
+                funcionario1: funcionario1Select.value,
+                funcionario2: funcionario2Select.value,
+                values: {},
+                total: 0
+            };
+
+            conditions.forEach(condition => {
+                const value = parseInt(document.getElementById(condition).textContent);
+                reportData.values[condition] = value;
+                reportData.total += value;
+            });
+
+            // Adiciona ao array de relatórios
+            reports.unshift(reportData);
+            reportCounter++;
+
+            // Atualiza a lista de relatórios
+            updateReportsList();
+
+            // Reseta o cronômetro e funcionários
+            resetTimer();
+            resetFuncionarios();
+            initializeValues();
+        }
+
+        function updateReportsList() {
+            if (reports.length === 0) {
+                reportsList.innerHTML = '<p class="no-reports">Nenhum relatório gerado ainda</p>';
+                return;
+            }
+
+            reportsList.innerHTML = '';
+
+            reports.forEach(report => {
+                const reportItem = document.createElement('div');
+                reportItem.className = 'report-item';
+                reportItem.dataset.reportId = report.id;
+
+                const reportHeader = document.createElement('div');
+                reportHeader.className = 'report-header';
+                reportHeader.innerHTML = `<span>Relatório ${report.id}</span>`;
+
+                const reportDate = document.createElement('div');
+                reportDate.className = 'report-date';
+                reportDate.textContent = report.date;
+
+                const reportFuncionarios = document.createElement('div');
+                reportFuncionarios.className = 'report-funcionarios';
+                reportFuncionarios.textContent = `${report.funcionario1} e ${report.funcionario2}`;
+
+                reportItem.appendChild(reportHeader);
+                reportItem.appendChild(reportDate);
+                reportItem.appendChild(reportFuncionarios);
+
+                reportItem.addEventListener('click', () => showReportDetails(report.id));
+
+                reportsList.appendChild(reportItem);
+            });
+        }
+
+        function showReportDetails(reportId) {
+            const report = reports.find(r => r.id === reportId);
+            if (!report) return;
+
+            // Atualiza os dados no modal
+            detailReportTitle.textContent = `Relatório ${report.id}`;
+            detailReportDate.textContent = report.date;
+            detailReportDuration.textContent = report.duration;
+            detailReportFunc1.textContent = report.funcionario1;
+            detailReportFunc2.textContent = report.funcionario2;
+
+            // Limpa itens anteriores
+            detailReportItems.innerHTML = '';
+
+            // Adiciona os itens do relatório
+            for (const [key, value] of Object.entries(report.values)) {
+                const item = document.createElement('div');
+                item.className = 'report-detail-item';
+                item.innerHTML = `<span>${key.charAt(0).toUpperCase() + key.slice(1)}:</span><span>${value}</span>`;
+                detailReportItems.appendChild(item);
+            }
+
+            // Atualiza o total
+            detailReportTotal.innerHTML = `<span>Total:</span><span>${report.total}</span>`;
+
+            // Cria ou atualiza o gráfico
+            updateChart(report);
+
+            // Mostra o modal
+            reportDetailModal.style.display = "flex";
+        }
+
+        function updateChart(report) {
+            // Destrói o gráfico anterior se existir
+            if (reportChart) {
+                reportChart.destroy();
+            }
+
+            const labels = conditions.map(cond => cond.charAt(0).toUpperCase() + cond.slice(1));
+            const data = conditions.map(cond => report.values[cond]);
+            const backgroundColors = [
+                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                '#9966FF', '#FF9F40', '#8AC24A', '#607D8B',
+                '#E91E63', '#9C27B0'
+            ];
+
+            const ctx = reportChartCanvas.getContext('2d');
+            reportChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function finalizeShift() {
+            stopTimer();
+            showSummary();
+            button.textContent = "Iniciar Turno";
+            button.classList.remove("active");
+            pauseBtnContainer.style.display = "none";
+            isPaused = false;
+            pauseBtn.textContent = "Pausar Turno";
+            pauseBtn.style.backgroundColor = "#FFA500";
+            confirmModal.style.display = "none";
+            hasScanned = false;
+
+            // Resetar selects para o valor padrão
+            resetFuncionarios();
+        }
+
+        // Função para analisar imagem com IA
+        async function analyzeImageWithAI(imageFile) {
+            const formData = new FormData();
+            formData.append("image", imageFile);
+
+            try {
+                loadingMessage.style.display = "block";
+                analyzeBtn.disabled = true;
+                analyzeBtn.textContent = "Analisando...";
+
+                const response = await fetch('http://localhost:5000/api/contar', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    // Atualiza os valores na interface
+                    updateValuesFromCounts(data.counts);
+                    hasScanned = true;
+                    alert("Análise concluída com sucesso!");
+                } else {
+                    alert("Erro na análise: " + (data.error || "Erro desconhecido"));
+                    console.error("Resposta da API:", data);
+                }
+            } catch (error) {
+                alert("Erro ao conectar com o servidor. Verifique se o backend está rodando na porta 5000.");
+                console.error("Erro:", error);
+            } finally {
+                loadingMessage.style.display = "none";
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = "Analisar Imagem";
+            }
+        }
+
+        // Função para atualizar valores a partir da contagem
+        function updateValuesFromCounts(counts) {
+            conditions.forEach(condition => {
+                const value = counts[condition] || 0;
+                document.getElementById(condition).textContent = value;
+            });
+        }
+
+        button.addEventListener("click", () => {
+            if (button.classList.contains("active")) {
+                // Mostra modal de confirmação ao finalizar
+                confirmModal.style.display = "flex";
+            } else {
+                // Verifica se os funcionários foram selecionados
+                if (funcionario1Select.selectedIndex === 0 || funcionario2Select.selectedIndex === 0) {
+                    alert("Por favor, selecione os funcionários responsáveis antes de iniciar o turno.");
+                    return;
+                }
+
+                startTimer();
+                button.textContent = "Finalizar Turno";
+                button.classList.add("active");
+                pauseBtnContainer.style.display = "block";
+            }
+        });
+
+        // Botão de pausar
+        pauseBtn.addEventListener("click", () => {
+            isPaused = !isPaused;
+            pauseBtn.textContent = isPaused ? "Continuar Turno" : "Pausar Turno";
+            pauseBtn.style.backgroundColor = isPaused ? "#4CAF50" : "#FFA500";
+        });
+
+        // Confirmação para finalizar turno
+        confirmEnd.addEventListener("click", () => {
+            if (!hasScanned) {
+                // Mostra o modal de escaneamento obrigatório
+                confirmModal.style.display = "none";
+                scanRequiredModal.style.display = "flex";
+            } else {
+                // Finaliza o turno se já escaneou
+                finalizeShift();
+            }
+        });
+
+        cancelEnd.addEventListener("click", () => {
+            confirmModal.style.display = "none";
+        });
+
+        // Fechar o modal de resumo
+        closeSummary.addEventListener("click", () => {
+            summaryModal.style.display = "none";
+            resetTimer();
+        });
+
+        // Fechar o modal de detalhes do relatório
+        closeReportBtn.addEventListener("click", () => {
+            reportDetailModal.style.display = "none";
+        });
+
+        // Botão "Entendi" do modal de escaneamento
+        understandBtn.addEventListener("click", function () {
+            scanRequiredModal.style.display = "none";
+            // Redireciona para a tela de escaneamento
+            mainScreen.style.display = "none";
+            scanScreen.style.display = "flex";
+            updateActiveIcon(scanIcon);
+        });
+
+        // Event listener para o botão de análise
+        analyzeBtn.addEventListener("click", function () {
+            const file = imageInput.files[0];
+            if (!file) {
+                alert("Por favor, selecione uma imagem do ábaco.");
+                return;
+            }
+
+            // Verifica se é uma imagem
+            if (!file.type.match('image.*')) {
+                alert("Por favor, selecione um arquivo de imagem.");
+                return;
+            }
+
+            analyzeImageWithAI(file);
+        });
+
+        // --- ALTERAÇÃO AQUI ---
+        // Mostrar nome do arquivo e pré-visualização da imagem
+        imageInput.addEventListener("change", function () {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                fileName.textContent = "Arquivo selecionado: " + file.name;
+
+                // Cria o leitor de arquivo
+                const reader = new FileReader();
+                
+                // Define o que acontece quando o arquivo é lido
+                reader.onload = function(e) {
+                    // e.target.result contém a imagem como Data URL
+                    fileInputLabel.style.backgroundImage = `url(${e.target.result})`;
+                    fileInputLabel.style.backgroundSize = "cover";
+                    fileInputLabel.style.backgroundPosition = "center";
+                    fileInputLabel.style.borderStyle = "solid"; // Muda a borda para sólida
+                    fileInputLabel.textContent = ""; // Remove o texto "📷 Clique para..."
+                }
+                
+                // Lê o arquivo como Data URL
+                reader.readAsDataURL(file);
+
+            } else {
+                fileName.textContent = "";
+                
+                // Reverte para o estado original se nenhum arquivo for selecionado
+                fileInputLabel.style.backgroundImage = "none";
+                fileInputLabel.style.borderStyle = "dashed";
+                fileInputLabel.textContent = "📷 Clique para selecionar uma imagem do ábaco";
+            }
+        });
+
+        // Botão para gerar relatório
+        reportBtn.addEventListener("click", function () {
+            if (!hasScanned) {
+                alert("Por favor, analise uma imagem ou insira os dados manualmente primeiro.");
+                return;
+            }
+
+            createReport();
+            scanScreen.style.display = "none";
+            reportScreen.style.display = "flex";
+            updateActiveIcon(reportIcon);
+        });
+
+        // Controle da navegação entre telas
+        scanIcon.addEventListener("click", () => {
+            if (isShiftActive) {
+                mainScreen.style.display = "none";
+                scanScreen.style.display = "flex";
+                reportScreen.style.display = "none";
+                updateActiveIcon(scanIcon);
+                // Não reseta os valores ao apenas trocar de tela
+                // initializeValues(); 
+            }
+        });
+
+        homeIcon.addEventListener("click", () => {
+            mainScreen.style.display = "flex";
+            scanScreen.style.display = "none";
+            reportScreen.style.display = "none";
+            updateActiveIcon(homeIcon);
+        });
+
+        reportIcon.addEventListener("click", () => {
+            mainScreen.style.display = "none";
+            scanScreen.style.display = "none";
+            reportScreen.style.display = "flex";
+            updateActiveIcon(reportIcon);
+            updateReportsList();
+        });
+        
+        // --- NOVA LÓGICA DO MODAL DE EDIÇÃO ---
+
+        // Abrir o modal de edição
+        editScanIcon.addEventListener("click", () => {
+            // 1. Pega os valores atuais da tela e coloca nos inputs do modal
+            conditions.forEach(condition => {
+                const currentValue = document.getElementById(condition).textContent;
+                const inputField = document.getElementById(`edit_${condition}`);
+                inputField.value = currentValue;
+            });
+            
+            // 2. Mostra o modal
+            editScanModal.style.display = "flex";
+        });
+        
+        // Cancelar edição
+        cancelEditScan.addEventListener("click", () => {
+            editScanModal.style.display = "none";
+        });
+        
+        // Salvar edição
+        saveEditScan.addEventListener("click", () => {
+            // 1. Pega os valores dos inputs e atualiza na tela
+            conditions.forEach(condition => {
+                const inputField = document.getElementById(`edit_${condition}`);
+                let newValue = parseInt(inputField.value);
+                
+                // Validação para não salvar valores negativos ou inválidos
+                if (isNaN(newValue) || newValue < 0) {
+                    newValue = 0;
+                }
+                
+                const displaySpan = document.getElementById(condition);
+                displaySpan.textContent = newValue;
+            });
+            
+            // 2. Marca como "escaneado" pois agora temos dados
+            hasScanned = true;
+            
+            // 3. Fecha o modal
+            editScanModal.style.display = "none";
+        });
+        
+        // --- FIM DA NOVA LÓGICA ---
+
+        function updateActiveIcon(activeIcon) {
+            [scanIcon, homeIcon, reportIcon].forEach(icon => {
+                icon.classList.remove("active");
+                const img = icon.querySelector("img");
+                img.src = icon.dataset.iconDefault;
+            });
+
+            activeIcon.classList.add("active");
+            const imgAtiva = activeIcon.querySelector("img");
+            imgAtiva.src = activeIcon.dataset.iconActive;
+        }
+
+        // Inicializa as imagens corretamente
+        document.querySelectorAll(".icon-container").forEach(i => {
+            const img = i.querySelector("img");
+            img.src = i.classList.contains("active") ? i.dataset.iconActive : i.dataset.iconDefault;
+        });
+    </script>
+</body>
+</html>
